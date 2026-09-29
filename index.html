@@ -79,7 +79,7 @@ const CONFIG = {
         },
         {
           // 하이스타 조커는 원래 "지역단시상" 시트의 인보험실적 열 데이터를 사용하지만,
-          // 실제로는 부문시상 항목이라 이번 주부터 부문시상 탭에서 표시합니다.
+          // 실제로는 부문시상 항목이라 부문시상 탭에서 표시합니다.
           // sourceSheet를 지정하면 화면은 부문시상 탭에 뜨되, 값은 jiyeokdan 시트에서 읽어옵니다.
           sourceSheet: "jiyeokdan",
           match: "인보험",
@@ -112,6 +112,7 @@ const CONFIG = {
   //    - rankingSourceSheet : 팀원 순위를 계산할 실적이 들어있는 시트 (bumun 또는 jiyeokdan 중 선택)
   //    - rankingMatch : 위 시트의 F열 이후 헤더 텍스트 중 이 글자가 포함된 열의 값을 순위 기준으로 사용
   //      (예: "지역단시상" 시트 G열 헤더가 "당월 인보험실적"이면 "당월"로 설정)
+  //    - rankingLabel : 화면에 표시할 순위 기준 이름 (예: "당월 인보험 실적")
   //    - specialTeamCode / specialTeamMaxMonth : 팀 값이 specialTeamCode(예: "00")인 팀장은
   //      같은 팀이 아니라 "같은 지점 전체"에서 차월(E열)이 specialTeamMaxMonth 이하인 사람만
   //      순위에 포함합니다 (신입 통합 관리팀 등 특수 팀 코드를 위한 설정).
@@ -119,6 +120,7 @@ const CONFIG = {
     leaderSheetName: "팀장",
     rankingSourceSheet: "jiyeokdan",
     rankingMatch: "당월",
+    rankingLabel: "당월 인보험 실적",
     tabLabel: "MY팀 현황",
     specialTeamCode: "00",
     specialTeamMaxMonth: 24
@@ -182,15 +184,6 @@ const CONFIG = {
     height:auto;
     display:block;
   }
-  .week-badge-inline{
-    display:flex; align-items:center; justify-content:center; gap:6px;
-    font-size:12.5px; font-weight:700; color:var(--sub);
-    padding:14px 0 4px;
-  }
-  .week-badge-inline .dot{
-    width:6px; height:6px; border-radius:50%; background:var(--orange); flex-shrink:0;
-  }
-  .week-badge-inline b{ color:var(--orange-deep); font-weight:800; }
 
   main{ position:relative; z-index:1; display:block; }
 
@@ -203,53 +196,21 @@ const CONFIG = {
     box-shadow: 0 -6px 20px rgba(21,34,56,0.05);
   }
 
+  .week-badge-inline{
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    font-size:12.5px; font-weight:700; color:var(--sub);
+    padding:0 0 18px;
+  }
+  .week-badge-inline .dot{
+    width:6px; height:6px; border-radius:50%; background:var(--orange); flex-shrink:0;
+  }
+  .week-badge-inline b{ color:var(--orange-deep); font-weight:800; }
+
   /* ---- 시상안 보기: 넓고 강조된 오렌지 버튼 ---- */
   .rules-toggle-wrap{ margin-bottom:14px; }
-  .rules-toggle-btn{ width:100%; }
-
-  /* ---- 바로가기 카드 2개 (아이콘+제목+설명+화살표) ---- */
-  .shortcut-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0 6px; }
-  .shortcut-card{
-    display:block; text-align:left; position:relative;
-    background:#fff; border:1px solid var(--border); border-radius:14px;
-    padding:15px 14px 34px; cursor:pointer;
-    box-shadow: 0 1px 3px rgba(16,24,40,0.05);
-  }
-  .shortcut-icon{ font-size:24px; margin-bottom:8px; display:block; }
-  .shortcut-title{ font-size:14px; font-weight:800; color:var(--navy); display:block; }
-  .shortcut-desc{ font-size:11px; color:var(--sub); margin-top:4px; line-height:1.4; display:block; }
-  .shortcut-arrow{
-    position:absolute; right:12px; bottom:12px;
-    width:24px; height:24px; border-radius:50%;
-    background:var(--orange-tint); color:var(--orange-deep);
-    font-size:13px; font-weight:900;
-    display:flex; align-items:center; justify-content:center;
-  }
-
-  .brand-footer{ text-align:center; padding:18px 20px 4px; }
-  .brand-footer .love{ font-size:13px; font-weight:800; color:var(--navy); }
-  .brand-footer .copyright{ font-size:11px; color:var(--sub); margin-top:6px; }
-
-  .card{
-    background:var(--card);
-    border-radius:14px;
-    padding:22px 20px;
-    margin-bottom:16px;
-    border:1px solid var(--border);
-    box-shadow: 0 1px 3px rgba(16,24,40,0.04);
-  }
-  .card h3{
-    margin:0 0 6px;
-    font-size:17px;
-    color:var(--navy);
-    font-weight:800;
-    display:flex; align-items:center; gap:8px;
-  }
-  .card h3 .bar{ width:4px;height:16px;background:var(--orange); border-radius:2px;display:inline-block; }
-  .card .desc{ font-size:13px; color:var(--sub); margin: 0 0 18px; }
-
   .rules-toggle-btn{
     display:flex; align-items:center; justify-content:center; gap:8px;
+    width:100%;
     padding:15px 22px;
     background: var(--orange);
     border:none;
@@ -294,6 +255,47 @@ const CONFIG = {
     font-size:11px; color:var(--sub); line-height:1.5; margin-top:5px; padding-left:10px; position:relative;
   }
   .rules-notes li::before{ content:"※"; position:absolute; left:-3px; top:0; font-size:10px; }
+
+  /* ---- 바로가기 카드 2개 (아이콘+제목+설명+화살표) ---- */
+  .shortcut-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0 6px; }
+  .shortcut-card{
+    display:block; text-align:left; position:relative;
+    background:#fff; border:1px solid var(--border); border-radius:14px;
+    padding:15px 14px 34px; cursor:pointer;
+    box-shadow: 0 1px 3px rgba(16,24,40,0.05);
+  }
+  .shortcut-icon{ font-size:24px; margin-bottom:8px; display:block; }
+  .shortcut-title{ font-size:14px; font-weight:800; color:var(--navy); display:block; }
+  .shortcut-desc{ font-size:11px; color:var(--sub); margin-top:4px; line-height:1.4; display:block; }
+  .shortcut-arrow{
+    position:absolute; right:12px; bottom:12px;
+    width:24px; height:24px; border-radius:50%;
+    background:var(--orange-tint); color:var(--orange-deep);
+    font-size:13px; font-weight:900;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  .brand-footer{ text-align:center; padding:18px 20px 4px; }
+  .brand-footer .love{ font-size:13px; font-weight:800; color:var(--navy); }
+  .brand-footer .copyright{ font-size:11px; color:var(--sub); margin-top:6px; }
+
+  .card{
+    background:var(--card);
+    border-radius:14px;
+    padding:22px 20px;
+    margin-bottom:16px;
+    border:1px solid var(--border);
+    box-shadow: 0 1px 3px rgba(16,24,40,0.04);
+  }
+  .card h3{
+    margin:0 0 6px;
+    font-size:17px;
+    color:var(--navy);
+    font-weight:800;
+    display:flex; align-items:center; gap:8px;
+  }
+  .card h3 .bar{ width:4px;height:16px;background:var(--orange); border-radius:2px;display:inline-block; }
+  .card .desc{ font-size:13px; color:var(--sub); margin: 0 0 18px; }
 
   label{ display:block; font-size:15px; font-weight:700; margin:16px 0 8px; color:var(--text); }
   label:first-of-type{ margin-top:0; }
@@ -682,7 +684,7 @@ const CONFIG = {
     this.classList.toggle('open');
   });
 
-  var workbookData = null; // { bumun: {headers, rowsByCode}, jiyeokdan: {headers, rowsByCode} }
+  var workbookData = null; // { bumun: {headers, rowsByCode}, jiyeokdan: {headers, rowsByCode}, leaders: Set, verify: {code: birth6} }
   var loadFailed = false;
 
   function parseSheet(wb, sheetName){
@@ -996,7 +998,7 @@ const CONFIG = {
         var months = Number(row.month);
         if (isNaN(months) || months > CONFIG.teamRanking.specialTeamMaxMonth) return;
       } else {
-        if (String(row.team) !== String(team)) return;
+        if (String(row.team) !== String(team) || String(row.branch) !== String(branch)) return;
       }
       members.push({ code: code, name: row.name || code, value: row.values[colIdx] || 0 });
     });
@@ -1008,7 +1010,7 @@ const CONFIG = {
     }
 
     var titleSuffix = isSpecialTeam ? (escapeHtml(branch) + ' 내 ' + CONFIG.teamRanking.specialTeamMaxMonth + '차월 이하') : '우리 팀';
-    var html = '<div class="detail-section-title"><span class="bar"></span>' + titleSuffix + ' ' + escapeHtml(CONFIG.teamRanking.rankingMatch) + ' 순위</div>';
+    var html = '<div class="detail-section-title"><span class="bar"></span>' + titleSuffix + ' ' + escapeHtml(CONFIG.teamRanking.rankingLabel) + '순위</div>';
     html += '<div class="myteam-rank-list">';
     members.forEach(function(m, idx){
       var rank = idx + 1;
